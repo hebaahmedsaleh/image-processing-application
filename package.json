@@ -9,7 +9,10 @@
     "test": "npm run build && npm run jasmine",
     "prepare": "husky install",
     "start": "node build/server.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q build/server.js\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q build/server.js\"",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
+    "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./prettierrc.json"
   },
   "author": "Heba Saleh",
   "license": "ISC",

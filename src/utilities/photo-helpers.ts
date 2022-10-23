@@ -1,17 +1,17 @@
-import { Request, Response } from "express";
-import fs, { Stats } from "fs";
-import path from "path";
-import sharp from "sharp";
+import { Request, Response } from 'express';
+import fs, { Stats } from 'fs';
+import path from 'path';
+import sharp from 'sharp';
 
 const RADIX = 10;
-const validImageExtensions = ["jpg", "jpeg", "png", "bmp", "gif"];
+const validImageExtensions = ['jpg', 'jpeg', 'png', 'bmp', 'gif'];
 
 const isValidNumbers: (value: number) => boolean = (value) => !isNaN(value);
 const getAbsolutePath: (filePath: string) => string = (filePath) =>
   path.resolve(filePath);
 
 const getImageExtension: (name: string) => string = (name) => {
-  const extension = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+  const extension = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
   return extension;
 };
 
@@ -44,7 +44,7 @@ export const resizeImage = async (
 ) => {
   const { filename, width, height } = query;
   const extension = getImageExtension(filename);
-  const name = filename.replace(extension, "");
+  const name = filename.replace(extension, '');
   const resizedImageDir = `${__dirname}/thumb-images`;
   console.log({ __dirname });
 
@@ -65,7 +65,7 @@ export const resizeImage = async (
         if (err) {
           return console.error({ err });
         } else {
-          console.log("Directory created successfully!");
+          console.log('Directory created successfully!');
 
           test(imagePath, query, resizedImagesPath);
         }
@@ -86,16 +86,16 @@ const previewPhoto = (reguest: Request, response: Response) => {
   const imageDirPath = `./images/${filename}`;
   const absoluteFilePath = getAbsolutePath(`./images/${filename}`);
   const absoluteFileThumbPath = getAbsolutePath(
-    "./build/utilities/thumb-images/"
+    './build/utilities/thumb-images/'
   );
 
   if (!isValidImage(filename as string) || !filename) {
-    response.status(400).send("This file not image.");
+    response.status(400).send('This file not image.');
   }
 
   fs.stat(imageDirPath, (error) => {
     if (error) {
-      response.status(404).send("The file does not exist.");
+      response.status(404).send('The file does not exist.');
     } else {
       if (width && height) {
         resizeImage(absoluteFilePath, reguest.query).then((res) => {

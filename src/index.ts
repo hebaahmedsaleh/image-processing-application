@@ -1,4 +1,4 @@
-import { promises as fsPromises } from "fs";
+import { promises as fsPromises } from 'fs';
 
 export function sum(a: number, b: number): number {
   return a + b;
@@ -7,7 +7,7 @@ export function sum(a: number, b: number): number {
 console.log(sum(6, 6));
 
 export const appendFile = async () => {
-  const myFile = await fsPromises.writeFile("heba.txt", "a+");
+  const myFile = await fsPromises.writeFile('heba.txt', 'a+');
 };
 
 // import express, { Express, Request, Response } from "express";
