@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const photo_helpers_1 = __importDefault(require("../utilities/photo-helpers"));
 const router = express_1.default.Router();
-router.get("/images", (reguest, response) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/images', (reguest, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         (0, photo_helpers_1.default)(reguest, response);
     }

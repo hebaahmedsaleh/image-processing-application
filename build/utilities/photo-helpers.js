@@ -17,11 +17,11 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
 const RADIX = 10;
-const validImageExtensions = ["jpg", "jpeg", "png", "bmp", "gif"];
+const validImageExtensions = ['jpg', 'jpeg', 'png', 'bmp', 'gif'];
 const isValidNumbers = (value) => !isNaN(value);
 const getAbsolutePath = (filePath) => path_1.default.resolve(filePath);
 const getImageExtension = (name) => {
-    const extension = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+    const extension = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
     return extension;
 };
 const isValidImage = (name) => {
@@ -43,7 +43,7 @@ const test = (imagePath, query, resizedImagesPath) => __awaiter(void 0, void 0, 
 const resizeImage = (imagePath, query) => __awaiter(void 0, void 0, void 0, function* () {
     const { filename, width, height } = query;
     const extension = getImageExtension(filename);
-    const name = filename.replace(extension, "");
+    const name = filename.replace(extension, '');
     const resizedImageDir = `${__dirname}/thumb-images`;
     console.log({ __dirname });
     const resizedImagesPath = `${resizedImageDir}${name}-${Number(width)}-${Number(height)}.${extension}`;
@@ -58,7 +58,7 @@ const resizeImage = (imagePath, query) => __awaiter(void 0, void 0, void 0, func
                     return console.error({ err });
                 }
                 else {
-                    console.log("Directory created successfully!");
+                    console.log('Directory created successfully!');
                     test(imagePath, query, resizedImagesPath);
                 }
             }));
@@ -78,13 +78,13 @@ const previewPhoto = (reguest, response) => {
     const height = reguest.query.height;
     const imageDirPath = `./images/${filename}`;
     const absoluteFilePath = getAbsolutePath(`./images/${filename}`);
-    const absoluteFileThumbPath = getAbsolutePath("./build/utilities/thumb-images/");
+    const absoluteFileThumbPath = getAbsolutePath('./build/utilities/thumb-images/');
     if (!isValidImage(filename) || !filename) {
-        response.status(400).send("This file not image.");
+        response.status(400).send('This file not image.');
     }
     fs_1.default.stat(imageDirPath, (error) => {
         if (error) {
-            response.status(404).send("The file does not exist.");
+            response.status(404).send('The file does not exist.');
         }
         else {
             if (width && height) {
