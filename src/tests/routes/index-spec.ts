@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../server";
+import { app } from "../../index";
 
 describe("check the server on running", (): void => {
   it("responds with 200", (done): void => {

@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../server";
+import { app } from "../../index";
 
 describe("check the server on running and going to images and resize it", (): void => {
   it("responds with 200 to go to the image from images folder", (done): void => {

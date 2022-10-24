@@ -2,7 +2,7 @@
   "name": "clear",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.ts",
+  "main": "src/index.ts",
   "scripts": {
     "jasmine": "jasmine",
     "test": "npm run build && npm run jasmine",
@@ -10,8 +10,8 @@
     "compile": "npx tsc",
     "build": "npm run clean && npm run compile",
     "prepare": "husky install",
-    "start": "node build/server.js",
-    "dev": "concurrently \"npm run build --watch\" \"nodemon -q build/server.js\"",
+    "start": "node build/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q build/index.js\"",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
     "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./prettierrc.json"
