@@ -1,25 +1,52 @@
-#Add the dependencies required for this project, including Express, TypeScript, Jasmine, Eslint, and Prettier. Complete your package.json file
+### Scripts
 
-############################################## DONE ##############################################
+- Install: `npm install`
+- Build: `npm run build`
+- lint: `npm run lint`
+- format: `npm run format`
+- Test: `npm run test`
+- Start server: `npm run start`
+- remove build folder: `npm run clean`
 
-#Set up your project structure. Create folders and files for what you anticipate you will need for the project. (routes missing)
+### Usage
 
-############################################## DONE ##############################################
+- npm install
+- create file like .env.example called .env before build project
+- npm run dev
 
-#Configure your middleware and dependencies. You have quite a few dependencies that all need to work together. Sometimes it's easiest to write some simple js functions to test that all of your dependencies work together before you begin adding any functionality.
+#### Brief instructions
 
-############################################## DONE ##############################################
+http://localhost:port/
 
-scenario put url: http://localhost:8000/images?filename=img1.jpg&width=300&height=400
+#### Endpoint to resize images
 
-if(http://localhost:8000/images?filename=img1.jpg) exist
-return it from server
+http://localhost:port/images
 
-else return not found
+Expected query arguments are:
 
-if(width and height are number and photo exist in our folder & !resized before with same origins)
+- _filename_: Available filenames are:
+  - icelandwaterfall.jpeg
+  - img1.jpg
+  - img2.jpg
+- _width_: numerical pixel value > 0
+- _height_: numerical pixel value > 0
 
-return resized image with width and height
+#### Example 1
 
-if(alreadyexist)
-return;
+http://localhost:8000/images
+Will display a hint and list available image names
+
+#### Example 2
+
+http://localhost:8000/images?filename=icelandwaterfall.jpeg
+it will display the original icelandwaterfall image.
+
+#### Example 3
+
+http://localhost:8000/images?filename=icelandwaterfall.jpeg&width=400&height=500
+it will resize image with width and height then save it in build folder
+
+#### Example 4
+
+http://localhost:3000/api/images?filename=icelandwaterfall.jpeg&width=-400&height=200
+will ignore coordinates and show origin image.
