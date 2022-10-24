@@ -12,6 +12,7 @@
 
 - npm install
 - create file like .env.example called .env before build project
+- npm run build
 - npm run dev
 
 #### Brief instructions
