@@ -3,10 +3,17 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 
+interface QueryTypes {
+  filename?: string;
+  width?: string;
+  height?: string;
+}
+
 const RADIX = 10;
 const validImageExtensions = ["jpg", "jpeg", "png", "bmp", "gif"];
 
-const isValidNumbers: (value: number) => boolean = (value) => !isNaN(value);
+const isValidNumbers: (value: number) => boolean = (value) =>
+  !isNaN(value) && value > 0;
 const getAbsolutePath: (filePath: string) => string = (filePath) =>
   path.resolve(filePath);
 
@@ -38,13 +45,12 @@ const resizeImage = async (imagePath: string, query: Record<string, any>) => {
 
 export const resizeImageProcess = async (
   imagePath: string,
-  query: Record<string, any>,
-  resizedPhotoAbsolutePath: string
+  query: Record<string, any>
 ) => {
   try {
     return resizeImage(imagePath, query);
   } catch (error) {
-    console.log({ error });
+    return error;
   }
 };
 
@@ -53,57 +59,55 @@ const processPhoto = (reguest: Request, response: Response) => {
   const width = reguest.query.width;
   const height = reguest.query.height;
 
-  if (!filename) {
-    response.end("No file name in route");
-  }
-
-  const absoluteImagesDir = getAbsolutePath(`./images/`);
-  const absoluteThumbDir = getAbsolutePath("./build/utilities/");
-  const extension = getImageExtension(filename as string);
-
-  const name = filename?.replace(`.${extension}`, "");
-  let resizedImagesPath = "";
-
-  if (!height && !width) {
-    fs.stat(absoluteImagesDir, () => {
-      return response.sendFile(`${absoluteImagesDir}/${filename}`);
-    });
-  }
-
-  if (isValidNumbers(Number(width)) && isValidNumbers(Number(height))) {
-    resizedImagesPath = `${absoluteThumbDir}/${name}_${Number(width)}_${Number(
-      height
-    )}.${extension}`;
-
-    fs.stat(absoluteImagesDir, async (error) => {
-      if (error) {
-        response.status(404).send("The file does not exist.");
-      } else {
-        try {
-          console.log({ resizedImagesPath });
-          await fs.accessSync(resizedImagesPath);
-          console.log("Image already exists");
-          return response.sendFile(path.resolve(resizedImagesPath));
-        } catch (ex) {
-          console.log("Image does not exist. Next Step: Resizing");
-        }
-        resizeImageProcess(
-          absoluteImagesDir,
-          reguest.query,
-          resizedImagesPath
-        ).then((res) => {
-          if (res) {
-            fs.writeFile(resizedImagesPath, res, "binary", () => {
-              return response.sendFile(path.resolve(resizedImagesPath));
-            });
-          }
-        });
-      }
-    });
-  }
-
   if (!isValidImage(filename as string) || !filename) {
     return response.status(400).send("This file not image.");
+  }
+
+  if (!filename) {
+    response.end("No file name in route");
+  } else {
+    const absoluteImagesDir = getAbsolutePath(`./images/`);
+    const absoluteThumbDir = getAbsolutePath("./build/utilities/");
+    const extension = getImageExtension(filename as string);
+
+    let resizedImagesPath = "";
+
+    if (
+      isValidNumbers(Number(width)) &&
+      Number(width) > 0 &&
+      isValidNumbers(Number(height)) &&
+      Number(height) > 0 &&
+      typeof filename === "string"
+    ) {
+      const name = filename?.replace(`.${extension}`, "");
+      resizedImagesPath = `${absoluteThumbDir}/${name}_${Number(
+        width
+      )}_${Number(height)}.${extension}`;
+
+      fs.stat(absoluteImagesDir, async (error) => {
+        if (error) {
+          response.status(404).send("The file does not exist.");
+        } else {
+          try {
+            await fs.accessSync(resizedImagesPath);
+
+            return response.sendFile(path.resolve(resizedImagesPath));
+          } catch (exception) {
+            resizeImageProcess(absoluteImagesDir, reguest.query).then((res) => {
+              if (res) {
+                fs.writeFile(resizedImagesPath, res, "binary", () => {
+                  return response.sendFile(path.resolve(resizedImagesPath));
+                });
+              }
+            });
+          }
+        }
+      });
+    } else {
+      fs.stat(absoluteImagesDir, () => {
+        return response.sendFile(`${absoluteImagesDir}/${filename}`);
+      });
+    }
   }
 };
 
