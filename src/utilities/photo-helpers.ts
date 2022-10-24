@@ -75,50 +75,29 @@ const processPhoto = (reguest: Request, response: Response) => {
       height
     )}.${extension}`;
 
-    fs.stat(absoluteImagesDir, (error) => {
+    fs.stat(absoluteImagesDir, async (error) => {
       if (error) {
         response.status(404).send("The file does not exist.");
       } else {
-        resizeImageProcess(absoluteImagesDir, reguest.query, resizedImagesPath)
-          .then(async (res) => {
-            try {
-              const b = await fs.accessSync(resizedImagesPath);
-              console.log({ b });
-
-              return b;
-            } catch {
-              return res;
-            }
-            // console.log("--+++-----", resizedImagesPath);
-            // fs.access(resizedImagesPath, (error) => {
-            //   if (!error) {
-            //     console.log("-------", resizedImagesPath);
-            //     return null;
-            //   } else {
-            //     console.log("noooo");
-            //     fs.writeFile(resizedImagesPath, res, "binary", () => {
-            //       return response.sendFile(path.resolve(resizedImagesPath));
-            //     });
-            //   }
-            //   console.log("noooo");
-            // });
-
-            //   if (!fs.existsSync(resizedImagesPath)) {
-            //     console.log("-------", resizedImagesPath);
-
-            //     fs.writeFile(resizedImagesPath, res, "binary", () => {
-            //       return response.sendFile(path.resolve(resizedImagesPath));
-            //     });
-            //   }
-          })
-          .then((res) => {
-            console.log({ res });
-            if (res) {
-              fs.writeFile(resizedImagesPath, res, "binary", () => {
-                return response.sendFile(path.resolve(resizedImagesPath));
-              });
-            }
-          });
+        try {
+          console.log({ resizedImagesPath });
+          await fs.accessSync(resizedImagesPath);
+          console.log("Image already exists");
+          return response.sendFile(path.resolve(resizedImagesPath));
+        } catch (ex) {
+          console.log("Image does not exist. Next Step: Resizing");
+        }
+        resizeImageProcess(
+          absoluteImagesDir,
+          reguest.query,
+          resizedImagesPath
+        ).then((res) => {
+          if (res) {
+            fs.writeFile(resizedImagesPath, res, "binary", () => {
+              return response.sendFile(path.resolve(resizedImagesPath));
+            });
+          }
+        });
       }
     });
   }
