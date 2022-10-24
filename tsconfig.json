@@ -3,7 +3,7 @@
     "outDir": "./build",
     "rootDir": "./src",
     "strict": true,
-    "lib": ["es6"],
+    "lib": ["es6", "ES2021.String"],
     "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,

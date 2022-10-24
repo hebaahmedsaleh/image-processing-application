@@ -20,20 +20,15 @@ const isValidImage: (name: string) => boolean = (name) => {
   return validImageExtensions.includes(extension);
 };
 
-const resizeImage = async (
-  imagePath: string,
-  query: Record<string, any>,
-  resizedImagesPath: string
-) => {
+const resizeImage = async (imagePath: string, query: Record<string, any>) => {
   const { filename, width, height } = query;
-  console.log({ resizeImage: imagePath });
 
   const resizedImage = await sharp(`${imagePath}/${filename}`)
     .resize({
       width: parseInt(width, RADIX),
       height: parseInt(height, RADIX),
     })
-    .toFile(resizedImagesPath)
+    .toBuffer()
     .then((res) => {
       return res;
     })
@@ -46,18 +41,8 @@ export const resizeImageProcess = async (
   query: Record<string, any>,
   resizedPhotoAbsolutePath: string
 ) => {
-  const resizedImageDir = `${__dirname}/thumb-images`;
   try {
-    if (!fs.existsSync(resizedImageDir)) {
-      fs.mkdir(resizedImageDir, async (err) => {
-        if (err) {
-          return err;
-        }
-        return resizeImage(imagePath, query, resizedPhotoAbsolutePath);
-      });
-    } else {
-      return resizeImage(imagePath, query, resizedPhotoAbsolutePath);
-    }
+    return resizeImage(imagePath, query);
   } catch (error) {
     console.log({ error });
   }
@@ -73,7 +58,7 @@ const processPhoto = (reguest: Request, response: Response) => {
   }
 
   const absoluteImagesDir = getAbsolutePath(`./images/`);
-  const absoluteThumbDir = getAbsolutePath("./build/utilities/thumb-images/");
+  const absoluteThumbDir = getAbsolutePath("./build/utilities/");
   const extension = getImageExtension(filename as string);
 
   const name = filename?.replace(`.${extension}`, "");
@@ -86,7 +71,7 @@ const processPhoto = (reguest: Request, response: Response) => {
   }
 
   if (isValidNumbers(Number(width)) && isValidNumbers(Number(height))) {
-    resizedImagesPath = `${absoluteThumbDir}/${name}-${Number(width)}-${Number(
+    resizedImagesPath = `${absoluteThumbDir}/${name}_${Number(width)}_${Number(
       height
     )}.${extension}`;
 
@@ -94,15 +79,46 @@ const processPhoto = (reguest: Request, response: Response) => {
       if (error) {
         response.status(404).send("The file does not exist.");
       } else {
-        const resizedPhotoAbsolutePath = absoluteThumbDir
-          .replace(filename as string, resizedImagesPath)
-          .concat(`/${name}-${width}-${height}.${extension}`);
+        resizeImageProcess(absoluteImagesDir, reguest.query, resizedImagesPath)
+          .then(async (res) => {
+            try {
+              const b = await fs.accessSync(resizedImagesPath);
+              console.log({ b });
 
-        resizeImageProcess(
-          absoluteImagesDir,
-          reguest.query,
-          resizedPhotoAbsolutePath
-        ).then(() => response.sendFile(resizedPhotoAbsolutePath));
+              return b;
+            } catch {
+              return res;
+            }
+            // console.log("--+++-----", resizedImagesPath);
+            // fs.access(resizedImagesPath, (error) => {
+            //   if (!error) {
+            //     console.log("-------", resizedImagesPath);
+            //     return null;
+            //   } else {
+            //     console.log("noooo");
+            //     fs.writeFile(resizedImagesPath, res, "binary", () => {
+            //       return response.sendFile(path.resolve(resizedImagesPath));
+            //     });
+            //   }
+            //   console.log("noooo");
+            // });
+
+            //   if (!fs.existsSync(resizedImagesPath)) {
+            //     console.log("-------", resizedImagesPath);
+
+            //     fs.writeFile(resizedImagesPath, res, "binary", () => {
+            //       return response.sendFile(path.resolve(resizedImagesPath));
+            //     });
+            //   }
+          })
+          .then((res) => {
+            console.log({ res });
+            if (res) {
+              fs.writeFile(resizedImagesPath, res, "binary", () => {
+                return response.sendFile(path.resolve(resizedImagesPath));
+              });
+            }
+          });
       }
     });
   }
