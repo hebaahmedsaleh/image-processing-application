@@ -59,6 +59,9 @@ const processPhoto = (reguest: Request, response: Response) => {
   const width = reguest.query.width;
   const height = reguest.query.height;
 
+  const isValidWidth = isValidNumbers(Number(width)) && Number(width) > 0;
+  const isValidHeight = isValidNumbers(Number(height)) && Number(height) > 0;
+
   if (!isValidImage(filename as string) || !filename) {
     return response.status(400).send("This file not image.");
   }
@@ -72,13 +75,7 @@ const processPhoto = (reguest: Request, response: Response) => {
 
     let resizedImagesPath = "";
 
-    if (
-      isValidNumbers(Number(width)) &&
-      Number(width) > 0 &&
-      isValidNumbers(Number(height)) &&
-      Number(height) > 0 &&
-      typeof filename === "string"
-    ) {
+    if (isValidWidth && isValidHeight && typeof filename === "string") {
       const name = filename?.replace(`.${extension}`, "");
       resizedImagesPath = `${absoluteThumbDir}/${name}_${Number(
         width
@@ -103,6 +100,10 @@ const processPhoto = (reguest: Request, response: Response) => {
           }
         }
       });
+    } else if (!isValidWidth) {
+      return response.status(404).send("Invalid width");
+    } else if (!isValidHeight) {
+      return response.status(404).send("Invalid height");
     } else {
       fs.stat(absoluteImagesDir, () => {
         return response.sendFile(`${absoluteImagesDir}/${filename}`);
