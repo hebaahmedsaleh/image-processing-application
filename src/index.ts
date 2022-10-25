@@ -2,9 +2,6 @@ import express, { Request, Response, Application } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 
-// import fs from 'fs';
-// import path from 'path';
-
 import images from "./routes/images";
 
 dotenv.config();
