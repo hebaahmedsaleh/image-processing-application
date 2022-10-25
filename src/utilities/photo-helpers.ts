@@ -1,16 +1,10 @@
-import { Request, Response } from "express";
-import fs from "fs";
-import path from "path";
-import sharp from "sharp";
-
-interface QueryTypes {
-  filename?: string;
-  width?: string;
-  height?: string;
-}
+import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
+import sharp from 'sharp';
 
 const RADIX = 10;
-const validImageExtensions = ["jpg", "jpeg", "png", "bmp", "gif"];
+const validImageExtensions = ['jpg', 'jpeg', 'png', 'bmp', 'gif'];
 
 const isValidNumbers: (value: number) => boolean = (value) =>
   !isNaN(value) && value > 0;
@@ -18,7 +12,7 @@ const getAbsolutePath: (filePath: string) => string = (filePath) =>
   path.resolve(filePath);
 
 const getImageExtension: (name: string) => string = (name) => {
-  const extension = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+  const extension = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
   return extension;
 };
 
@@ -63,47 +57,49 @@ const processPhoto = (reguest: Request, response: Response) => {
   const isValidHeight = isValidNumbers(Number(height)) && Number(height) > 0;
 
   if (!isValidImage(filename as string) || !filename) {
-    return response.status(400).send("This file not image.");
+    return response.status(400).send('This file not image.');
   }
 
   if (!filename) {
-    response.end("No file name in route");
+    response.end('No file name in route');
   } else {
-    const absoluteImagesDir = getAbsolutePath(`./images/`);
-    const absoluteThumbDir = getAbsolutePath("./build/utilities/");
+    const absoluteImagesDir = getAbsolutePath('./images/');
+    const absoluteThumbDir = getAbsolutePath('./build/utilities/');
     const extension = getImageExtension(filename as string);
 
-    let resizedImagesPath = "";
+    let resizedImagesPath = '';
 
-    if (isValidWidth && isValidHeight && typeof filename === "string") {
-      const name = filename?.replace(`.${extension}`, "");
+    if (isValidWidth && isValidHeight && typeof filename === 'string') {
+      const name = filename?.replace(`.${extension}`, '');
       resizedImagesPath = `${absoluteThumbDir}/${name}_${Number(
         width
       )}_${Number(height)}.${extension}`;
 
       fs.stat(absoluteImagesDir, async (error) => {
         if (error) {
-          response.status(404).send("The file does not exist.");
+          response.status(404).send('The file does not exist.');
         } else {
           try {
             await fs.accessSync(resizedImagesPath);
 
             return response.sendFile(path.resolve(resizedImagesPath));
           } catch (exception) {
-            resizeImageProcess(absoluteImagesDir, reguest.query).then((res) => {
-              if (res) {
-                fs.writeFile(resizedImagesPath, res, "binary", () => {
-                  return response.sendFile(path.resolve(resizedImagesPath));
-                });
-              }
-            });
+            resizeImageProcess(absoluteImagesDir, reguest.query)
+              .then((res) => {
+                if (res) {
+                  fs.writeFile(resizedImagesPath, res, 'binary', () => {
+                    return response.sendFile(path.resolve(resizedImagesPath));
+                  });
+                }
+              })
+              .catch(() => response.status(400).send("couldn't resize photo"));
           }
         }
       });
     } else if (!isValidWidth) {
-      return response.status(404).send("Invalid width");
+      return response.status(404).send('Invalid width');
     } else if (!isValidHeight) {
-      return response.status(404).send("Invalid height");
+      return response.status(404).send('Invalid height');
     } else {
       fs.stat(absoluteImagesDir, () => {
         return response.sendFile(`${absoluteImagesDir}/${filename}`);
