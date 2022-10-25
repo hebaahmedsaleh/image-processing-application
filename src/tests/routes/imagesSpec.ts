@@ -1,9 +1,9 @@
-import request from "supertest";
-import { app } from "../../index";
-import sizeOf from "buffer-image-size";
+import request from 'supertest';
+import { app } from '../../index';
+import sizeOf from 'buffer-image-size';
 
-describe("check the server on running and going to images and resize it", (): void => {
-  it("check image width and height after resizing", async () => {
+describe('check the server on running and going to images and resize it', (): void => {
+  it('check image width and height after resizing', async () => {
     const width = 400;
     const height = 500;
     const response = await request(app).get(
